@@ -6,7 +6,9 @@ var vhost = require('vhost');
 
 var modules = new HashMap();
 
-var flubber = express.Router();
+var flubber = {};
+
+flubber.Middleware = express.Router();
 
 flubber.setup = (setupPath) => {
 	var tempModules = new HashMap();

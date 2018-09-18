@@ -1,4 +1,4 @@
-import { Router, NextFunction } from 'express';
+import { Router, NextFunction, Request, Response } from 'express';
 
 export interface Module {
 	name: string;
@@ -15,4 +15,4 @@ export interface Module {
 
 export function setup(dir: string): void;
 
-export as namespace NextFunction;
+export function Middleware(req: Request, res: Response, next: NextFunction): void;
