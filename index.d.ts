@@ -13,6 +13,6 @@ export interface Module {
 	methods: Function
 }
 
-export function setup(dir: string);
+export function setup(dir: string): void;
 
-export = NextFunction;
+export as namespace NextFunction;
