@@ -1,0 +1,13 @@
+{
+	"name": "flubberjs",
+	"version": "2.1.0",
+	"dependencies": {
+		"express": "^4.16.2",
+		"hashmap": "^2.3.0",
+		"vhost": "^3.0.2"
+	},
+	"author": "Rakshith Ravi <rakshithravi1997@gmail.com>",
+	"devDependencies": {
+		"@types/express": "^4.16.0"
+	}
+}
