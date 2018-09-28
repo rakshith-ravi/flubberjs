@@ -1,23 +1,29 @@
 var fs = require('fs');
 var path = require('path');
-var HashMap = require('hashmap');
 var express = require('express');
 var vhost = require('vhost');
 
-var modules = new HashMap();
+var modules = new Map();
 
 var flubber = {};
 
 flubber.Middleware = express.Router();
 
 flubber.setup = (setupPath) => {
-	var tempModules = new HashMap();
+	var tempModules = new Map();
 
 	var folders = fs.readdirSync(setupPath);
 	folders.forEach(folder => {
 		var module = require(path.join(setupPath, folder));
+
+		if(module == undefined)
+			return;
+		// Account for ES5 Modules
+		module = module.default || module;
+
 		if(module.init && module.init != null)
 			module.init();
+		
 		if(tempModules.has(module.package)) {
 			console.error(
 				`Error: Module ${module.package} already exists`
@@ -28,7 +34,7 @@ flubber.setup = (setupPath) => {
 	});
 
 	var satisfied = true;
-	tempModules.values().forEach(mod => {
+	tempModules.forEach(mod => {
 		mod.dependencies.forEach(dependency => {
 			if(tempModules.has(dependency)) {
 				return;
@@ -44,42 +50,53 @@ flubber.setup = (setupPath) => {
 		return false;
 	}
 	modules = tempModules;
-	modules.forEach((value, key) => {
-		if(value.router != null) {
-			flubber.use(vhost(value.domain, value.router));
+	modules.forEach(value => {
+		if(value.router && value.router != null && value.domain) {
+			value.domain.forEach(domain => {
+				flubber.use(vhost(domain, value.router));
+			});
 		}
 	});
 }
 
+class FlubberModule {
+	name = "Flubber module";
+	package;
+	domain = ["*"];
+	mainRoute = "/";
+	router = null;	
+	initialize;
+	start;
+	dependencies = [];
+
+	_outlets;
+
+	constructor(packageName) {
+		this.package = packageName;
+	}
+	
+	outlet(name, cb) {
+		this._outlets.push({
+			name: name,
+			function: cb
+		});
+	}
+	
+	methods(name) {
+		var retVal;
+		modules.forEach((value) => {
+			value._outlets.forEach(outlet => {
+				if (outlet.name == name) {
+					retVal = outlet.function;
+				}
+			});
+		});
+		return retVal;
+	}
+}
+
 flubber.Module = (packageName) => {
-	return {
-		name: "Flubber module",
-		package: packageName,
-		domain: "*",
-		mainRoute: "/",
-		router: null,
-		_outlets: [],
-		outlet: (name, cb) => {
-			 _outlets.push({
-				name: name,
-				function: cb
-			});
-		},
-		initialize: undefined,
-		start: undefined,
-		dependencies: [],
-		methods: (name) => {
-			var retVal;
-			modules.forEach((value, key) => {
-				value._outlets.forEach(outlet => {
-					if(outlet.name == name) {
-						retVal = outlet.function;
-					}
-				});
-			});
-			return retVal;
-		}
-	};
+	return new FlubberModule(packageName);
 }
 
 module.exports = flubber;
