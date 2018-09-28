@@ -1,7 +1,7 @@
 {
 	"name": "flubberjs",
 	"description": "Route multiple domains on a singe express application",
-	"version": "2.2.1",
+	"version": "2.2.2",
 	"dependencies": {
 		"express": "^4.16.3",
 		"vhost": "^3.0.2"
@@ -11,6 +11,7 @@
 	"files": [
 		"package.json",
 		"index.js",
+		"index.d.ts",
 		"index.ts"
 	],
 	"devDependencies": {
