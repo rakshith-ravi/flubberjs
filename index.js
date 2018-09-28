@@ -53,26 +53,23 @@ flubber.setup = (setupPath) => {
 	modules.forEach(value => {
 		if(value.router && value.router != null && value.domain) {
 			value.domain.forEach(domain => {
-				flubber.use(vhost(domain, value.router));
+				flubber.Middleware.use(vhost(domain, value.router));
 			});
 		}
 	});
 }
 
 class FlubberModule {
-	name = "Flubber module";
-	package;
-	domain = ["*"];
-	mainRoute = "/";
-	router = null;	
-	initialize;
-	start;
-	dependencies = [];
-
-	_outlets;
-
 	constructor(packageName) {
+		this.name = "Flubber module";
 		this.package = packageName;
+		this.domain = ["*"];
+		this.mainRoute = "/";
+		this.router = null;
+		this.initialize;
+		this.start;
+		this.dependencies = [];
+		this._outlets = [];
 	}
 	
 	outlet(name, cb) {
